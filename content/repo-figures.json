@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/results/encoder-summary.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "54709eb0ef9a5906b0b61e0e7e6d5ebffaa7b46cae73740ce11bfef0ff384e4d"
+  },
+  {
+    "file": "assets/results/normal.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "4bfd6d9deb5bbda3cb3a2f5a2e8e601e016a8c66433d728fd5afe0fadf97396f"
+  },
+  {
+    "file": "assets/results/burst.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "672199d5c999794a17a3d3d4e81bb04a4740572008fe19bfd7b13a5bd1d661b2"
+  },
+  {
+    "file": "assets/results/traffic.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "519cf2aec8d90c19d8c48311c926ce0d9add7b60e78a0baa8cf25641e6a273fc"
+  },
+  {
+    "file": "assets/results/algorithms-normal.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "1909b0bf189cd37f06a84bae9da49da1568e71f053c93251b3489845d7558389"
+  },
+  {
+    "file": "assets/results/algorithms-burst.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "e40c26c1e96063c78746d91da0efa5faf0745c685dd5723684fd3019f97b79e4"
+  },
+  {
+    "file": "assets/results/algorithms-traffic.png",
+    "source": "runs/standard-v1/report.html",
+    "sha256": "bf2120628dc583196d9f44d0b5cdd7baa9057a149f9b93780567d41a6b5a040d"
+  },
+  {
+    "file": "assets/results/held_out_costs.png",
+    "source": "reports/figures/held_out_costs.png",
+    "sha256": "0d6b7d1fd675bc2a022fda8c5a94646b1b467ccc0203009dfc471f3371dd0c6a"
+  },
+  {
+    "file": "assets/results/service_tradeoffs.png",
+    "source": "reports/figures/service_tradeoffs.png",
+    "sha256": "a404b47855b10dfa8621dc55c819aafadcea8721e7381a2680f4a10f5aa545ce"
+  },
+  {
+    "file": "assets/results/validation_curves.png",
+    "source": "reports/figures/validation_curves.png",
+    "sha256": "bfb9d24824aa92a8cff6f012bbeb57744bcbc11f23b3c4fb23f3fa412c5d7766"
+  }
+]

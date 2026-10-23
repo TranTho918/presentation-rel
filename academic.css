@@ -1,0 +1,240 @@
+/* A restrained academic refinement of the existing presentation. */
+:root {
+  --bg: #fafbfc;
+  --paper: #fff;
+  --ink: #233548;
+  --secondary: #526273;
+  --surface: #eaf0f4;
+  --accent: #315f85;
+  --green: #376b60;
+  --blue: #577d98;
+  --head: clamp(30px, 3.1vw, 46px);
+  --body: clamp(17px, 1.45vw, 22px);
+}
+
+h1, .opening-copy h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1.13;
+}
+.opening-copy h1 { font-size: clamp(40px, 4.2vw, 64px); }
+.opening-layout img { clip-path: none; animation: enter .25s ease both; }
+.brand { font-weight: 600; }
+.brand-mark { background: var(--surface); color: var(--accent); }
+.chapters button { padding: 11px 20px; }
+.chapters .active { background: var(--surface); color: var(--ink); font-weight: 600; }
+.primary { background: var(--accent); color: var(--paper); font-weight: 500; }
+.primary:hover { background: #264e70; }
+.slide h1 { max-width: 1200px; }
+.slide-copy strong { font-weight: 600; }
+.slide-copy code { font-size: .85em; }
+.slide-copy blockquote { background: var(--surface); }
+.closing-statement { background: var(--surface); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; font-weight: 400; }
+.action-symbol { color: var(--accent); }
+.route-B .rail:before, .route-B .return-rail:before, .route-B .return-rail i { background: #a5763d; }
+.route-B .stop i { border-color: #a5763d; }
+.bar-fill.best { background: var(--accent); }
+.flow-node { padding: 22px 18px; font-size: clamp(16px, 1.5vw, 22px); }
+.slide, .slide h1, .slide-copy>*, .slide-visual, .slide-visual>*, .peak, .opening-numbers, .question, .opening-copy .primary { animation-duration: .25s; }
+
+.training-slide { min-height: 100%; height: auto; justify-content: flex-start; }
+.training-slide h1 { margin: 0 0 14px; }
+.slide-intro { margin: 0 0 28px; max-width: 1050px; font-size: var(--body); line-height: 1.5; color: var(--secondary); }
+.training-body { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 4%; align-items: center; flex: 1; }
+.training-body > * { min-width: 0; }
+.training-slide .slide-copy p { line-height: 1.5; margin-bottom: 18px; }
+.training-slide .katex-display { font-size: clamp(17px, 1.65vw, 25px); margin: 18px 0; }
+.training-visual .katex-display { font-size: clamp(15px, 1.2vw, 18px); }
+.training-visual { min-width: 0; }
+.training-visual .flow { gap: 8px; }
+.training-visual .flow-node { padding: 16px 12px; min-width: 100px; font-size: 18px; }
+.training-visual .flow-arrow { font-size: 20px; }
+.training-visual h2 { font-family: inherit; margin: 0 0 12px; font-size: 22px; letter-spacing: -.015em; line-height: 1.25; font-weight: 600; }
+.training-visual p { font-size: 18px; line-height: 1.5; margin: 0 0 14px; }
+.training-visual p:last-child { margin-bottom: 0; }
+.teaching-note { background: var(--surface); padding: 22px 26px; margin-top: 20px; }
+.teaching-note:first-child { margin-top: 0; }
+.concept-result { font-size: 20px; line-height: 1.45; font-weight: 500; margin: 18px 0 8px; }
+.takeaway { background: var(--surface); padding: 16px 22px; margin-top: 26px; font-size: 18px; line-height: 1.45; }
+.takeaway p { margin: 0; }
+.role-pair, .method-comparison, .checkpoint-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.role-pair > div, .method-comparison > div, .checkpoint-pair > div { background: var(--surface); padding: 22px; }
+.method-comparison > div:last-child, .checkpoint-pair > div:first-child { background: #dce7ef; }
+.parameter-list { margin: 0; font-size: 18px; line-height: 1.5; }
+.parameter-list > div { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 12px; }
+.parameter-list dd { margin: 0; font-weight: 600; text-align: right; }
+.dataset-roles { display: flex; flex-direction: column; gap: 14px; }
+.dataset-roles > div { background: var(--surface); padding: 18px 24px; }
+.dataset-roles h2 { margin-bottom: 4px; }
+.dataset-roles p { display: inline; margin-right: 24px; }
+.dataset-roles b { font-size: 18px; font-weight: 600; }
+.training-slide table { font-size: 18px; }
+.training-slide th, .training-slide td { padding: 14px 16px; }
+.training-slide caption { font-size: 15px; padding-bottom: 14px; }
+.training-slide .compact-table { font-size: 17px; }
+.training-encoders .training-body { grid-template-columns: .7fr 1.3fr; }
+.training-encoders .architecture { margin-bottom: 18px; }
+.training-encoders .split-path { gap: 12px; margin-top: 12px; }
+.training-encoders .split-path > div { padding: 16px; font-size: 17px; }
+.training-mask .mask-visual { max-width: 320px; }
+.training-mask .mask-summary { gap: 9px; margin-bottom: 10px; }
+.training-mask .mask-summary strong { font-size: 28px; }
+.training-mask .mask-summary span { font-size: 13px; }
+.training-mask .action-grid { margin: 10px 0; gap: 3px; }
+.training-mask .mask-legend { margin-bottom: 10px; }
+.training-mask .mask-visual .caption { font-size: 13px; }
+.training-mask .mask-visual .primary { font-size: 14px; padding: 10px 14px; }
+.training-mask .mask-consistency { margin-top: 12px; }
+.training-mask .mask-consistency .katex-display { margin: 12px 0; font-size: 18px; }
+.training-mask .mask-consistency p { font-size: 14px; text-align: center; }
+.training-ppo .training-body { grid-template-columns: 1.1fr 1fr; }
+.training-ppo .slide-copy .katex-display { font-size: 20px; }
+.training-ppo .teaching-note { padding: 20px; }
+.training-checkpoint .training-body { grid-template-columns: 1.25fr .85fr; }
+.training-checkpoint .checkpoint-pair { grid-template-columns: 1fr; }
+.training-pipeline .training-body { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 24px; }
+.training-pipeline .training-body .slide-copy { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+.training-pipeline .training-body .slide-copy p { font-size: 19px; margin: 0; }
+.training-pipeline .flow { margin-bottom: 14px; }
+.training-pipeline .flow-node { padding: 18px; }
+.training-visual .caption { font-size: 14px; }
+.training-visual, .slide-intro, .takeaway { animation: enter .25s ease both; }
+
+.source-links { margin-top: 18px; font-size: 13px; line-height: 1.5; color: var(--secondary); overflow-wrap: anywhere; }
+.source-links a { text-decoration: underline; text-underline-offset: 3px; }
+.evidence-slide { min-height: 100%; height: auto; justify-content: flex-start; }
+.evidence-body { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 2fr); gap: 36px; align-items: center; flex: 1; }
+.evidence-media { min-width: 0; }
+.ablation-slide .evidence-body { grid-template-columns: minmax(0, .58fr) minmax(0, 2fr); gap: 24px; }
+.ablation-slide .slide-copy { font-size: 20px; }
+.network-image { margin: 0; width: 100%; }
+.network-demo { width: 100%; color: #243b45; }
+.network-demo svg { display: block; width: 100%; height: auto; max-height: min(42vh, 390px); }
+.auto-demo { aspect-ratio: 16 / 9; width: min(100%, calc((100dvh - 310px) * 16 / 9)); margin: auto; }
+body.presenting .auto-demo { width: min(100%, calc((100dvh - 160px) * 16 / 9)); }
+.auto-demo svg { width: 100%; height: 100%; max-height: none; aspect-ratio: 16 / 9; }
+body[data-slide="2"] .slide h1, body[data-slide="3"] .slide h1 { font-size: clamp(25px, 2.5vw, 36px); margin-bottom: 22px; }
+body[data-slide="2"] .slide-copy p, body[data-slide="3"] .slide-copy p { font-size: clamp(16px, 1.35vw, 20px); }
+body[data-slide="2"] .slide, body[data-slide="3"] .slide,
+body[data-slide="2"] .slide h1, body[data-slide="3"] .slide h1,
+body[data-slide="2"] .slide-copy>*, body[data-slide="3"] .slide-copy>*,
+body[data-slide="2"] .slide-visual, body[data-slide="3"] .slide-visual { animation: none; }
+.demo-legend { display: flex; align-items: center; gap: 22px; margin-bottom: 12px; font-size: 16px; }
+.demo-legend span { display: flex; align-items: center; gap: 8px; }
+.demo-legend i { display: inline-block; width: 18px; height: 7px; }
+.demo-legend .demo-live { margin-left: auto; color: #667a78; font-size: 14px; }
+.demo-controls { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.demo-controls button { font-size: 15px; padding: 10px 15px; background: #e8efed; }
+.demo-controls .demo-dispatch { background: #243b45; color: white; }
+.demo-controls button:hover { background: #d5e2de; color: #243b45; }
+.demo-status { font-size: 15px; line-height: 1.45; margin: 12px 0 0; min-height: 44px; }
+@media (max-width: 680px) {
+ .auto-demo { width: 100%; }
+ .demo-legend { gap: 12px; font-size: 13px; flex-wrap: wrap; }
+ .demo-legend .demo-live { margin-left: 0; }
+ .demo-controls button { font-size: 13px; padding: 10px; }
+}
+.network-image img { display: block; width: 100%; height: auto; max-height: 510px; object-fit: contain; }
+body[data-slide="2"] .slide-body, body[data-slide="3"] .slide-body { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.7fr); gap: 28px; align-items: center; }
+body[data-slide="2"] .slide-visual, body[data-slide="3"] .slide-visual { order: 0; min-width: 0; }
+body[data-slide="1"] .opening-layout img { object-fit: contain; }
+@media (max-width: 1000px) {
+ body[data-slide="2"] .slide-body, body[data-slide="3"] .slide-body { grid-template-columns: 1fr; }
+}
+.findings-list { margin: 0; padding-left: 32px; display: grid; gap: 20px; }
+.findings-list li { padding-left: 10px; font-size: 23px; }
+.findings-list strong { font-size: 25px; }
+.findings-list p { margin: 5px 0 0; font-size: 20px; line-height: 1.4; }
+.conclusion-limit { margin-top: 24px; font-size: 17px; }
+@media (max-width: 680px) {
+ .findings-list strong { font-size: 21px; }
+ .findings-list p { font-size: 18px; }
+}
+.repo-figure { margin: 0; }
+.repo-figure img { width: 100%; height: auto; display: block; }
+.figure-open { display: block; width: 100%; padding: 0; background: var(--paper); }
+.repo-figure figcaption { font-size: 13px; line-height: 1.5; color: var(--secondary); margin-top: 12px; }
+.secondary-figure { padding: 12px 18px; margin-top: 18px; font-size: 16px; background: var(--surface); }
+#figure-dialog { width: min(1600px, 96vw); padding: 22px; }
+#figure-image { display: block; width: 100%; height: auto; }
+#sources-content li { margin-bottom: 14px; overflow-wrap: anywhere; }
+#sources-content a { text-decoration: underline; }
+#sources-content .repo-figure { margin-top: 30px; }
+@media (max-width: 1000px) {
+  .evidence-body { display: flex; flex-direction: column; align-items: stretch; gap: 24px; flex: 0; }
+  .evidence-slide .slide-copy { font-size: 18px; }
+}
+@media (max-width: 680px) {
+  .controls { padding-left: 12px; padding-right: 12px; }
+  .source-links { font-size: 12px; }
+  .repo-figure figcaption { font-size: 12px; }
+  #figure-dialog { padding: 14px; }
+}
+
+/* Show the complete equations; line breaks express the mathematical structure. */
+body[data-slide="12"] .slide-body .slide-copy .katex-display { font-size: clamp(20px, 2.15vw, 32px); }
+body[data-slide="13"] .slide-body { display: flex; flex-direction: column; align-items: stretch; gap: 26px; }
+body[data-slide="13"] .slide-copy { width: 100%; }
+body[data-slide="13"] .katex-display { font-size: clamp(19px, 1.9vw, 28px); }
+.interaction-loop { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 30px; }
+.interaction-loop li { position: relative; min-width: 0; background: var(--surface); padding: 24px 12px; display: grid; place-items: center; text-align: center; font-size: clamp(16px, 1.4vw, 21px); line-height: 1.45; overflow-wrap: anywhere; }
+.interaction-loop li:not(:last-child)::after { content: '→'; position: absolute; right: -30px; width: 30px; text-align: center; }
+body.presenting #fullscreen, body.presenting .controls { display: none; }
+
+@media (max-width: 1000px) {
+  .interaction-loop { grid-template-columns: 1fr; gap: 28px; }
+  .interaction-loop li { padding: 16px; }
+  .interaction-loop li:not(:last-child)::after { content: '↓'; right: auto; bottom: -27px; height: 27px; }
+}
+@media (max-width: 680px) {
+  body[data-slide="12"] .slide-body .slide-copy .katex-display { font-size: 18px; }
+  body[data-slide="13"] .katex-display { font-size: 17px; }
+}
+
+@media (min-width: 1001px) {
+  .training-td .teaching-note { padding: 18px 22px; margin-top: 14px; }
+  .training-td .teaching-note .katex-display { margin: 12px 0; }
+  .training-td .role-pair > div { padding: 18px 22px; }
+  .training-mask .mask-visual { max-width: 275px; }
+  .training-mask .mask-summary strong { font-size: 24px; }
+  .training-mask .mask-summary span { font-size: 12px; }
+  .training-mask .mask-visual .caption { margin-top: 8px; font-size: 13px; }
+  .training-mask .mask-consistency .katex-display { margin: 8px 0; font-size: 17px; }
+}
+
+@media (max-width: 1000px) {
+  .opening-copy h1 { font-size: 46px; }
+  .training-body, .training-encoders .training-body, .training-ppo .training-body, .training-checkpoint .training-body { grid-template-columns: 1fr; gap: 24px; }
+  .training-slide { justify-content: flex-start; }
+  .training-slide .slide-intro { margin-bottom: 24px; }
+  .training-body { flex: 0; }
+  .training-visual .flow-node { min-width: 100px; }
+  .training-mask .mask-visual { max-width: 340px; }
+  .training-checkpoint .checkpoint-pair { grid-template-columns: 1fr 1fr; }
+  .training-pipeline .training-body .slide-copy { display: block; }
+  .training-pipeline .training-body .slide-copy p { margin-bottom: 16px; }
+}
+@media (max-width: 680px) {
+  .flow-node { overflow-wrap: anywhere; }
+  .opening-copy h1 { font-size: 38px; }
+  .slide h1 { font-size: 30px; line-height: 1.15; margin-bottom: 20px; }
+  .training-slide h1 { margin-bottom: 14px; }
+  .slide-intro { font-size: 17px; }
+  .training-slide .katex-display, .training-ppo .slide-copy .katex-display { font-size: 17px; }
+  .training-slide .takeaway { margin-top: 24px; padding: 16px; font-size: 16px; }
+  .teaching-note { padding: 20px; }
+  .training-visual h2 { font-size: 20px; }
+  .training-visual p, .parameter-list { font-size: 16px; }
+  .concept-result { font-size: 18px; }
+  .role-pair, .method-comparison, .training-checkpoint .checkpoint-pair { grid-template-columns: 1fr; }
+  .training-slide table { min-width: 530px; font-size: 16px; }
+  .training-slide .slide-copy:has(table), .training-visual:has(table) { overflow-x: auto; }
+  .training-visual .compact-table { min-width: 520px; }
+  .training-slide .compact-table th, .training-slide .compact-table td { padding: 12px; }
+  .training-visual .flow-node { min-width: 90px; font-size: 16px; }
+  .training-mask .mask-summary { flex-wrap: nowrap; }
+  .dataset-roles p { display: block; margin-bottom: 8px; }
+  .parameter-list > div { gap: 14px; }
+  .training-encoders .split-path { grid-template-columns: 1fr; }
+}

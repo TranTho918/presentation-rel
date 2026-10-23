@@ -1,0 +1,107 @@
+[
+  {
+    "title": "Learning a Dispatch Policy",
+    "intro": "A policy learns which decision reduces cost over the whole operating period.",
+    "content": "Every **120 seconds**: observe → choose a feasible action → receive reward.\n\n$$G_t=\\sum_{k=t}^{T-1}\\gamma^{k-t}r_k$$\n\n$$J(\\theta)=\\mathbb{E}_{\\pi_\\theta}[G_0]$$\n\n**Project setting:** $\\gamma=1$ · finite 240-minute episode.",
+    "takeaway": "Dispatch may incur deadhead cost now and reduce waiting later. Learn from the full consequence.",
+    "diagram": "policy"
+  },
+  {
+    "title": "Policy Gradient",
+    "intro": "Learn action probabilities directly from the consequences of sampled decisions.",
+    "content": "The network produces a **logit** for each action; softmax gives its probability.\n\n$$\\pi_\\theta(a\\mid x)=\\frac{\\exp(z_a(x))}{\\sum_b\\exp(z_b(x))}$$\n\n$$\\widehat g\\propto\\sum_t\\nabla_\\theta\\log\\pi_\\theta(a_t\\mid x_t)\\,w_t$$\n\n$x$: observation and available history. $w_t$: a fixed quality signal during the actor update.",
+    "takeaway": "The gradient passes through the policy network. The simulator does not need to be differentiable.",
+    "diagram": "gradient"
+  },
+  {
+    "title": "REINFORCE and the Baseline",
+    "intro": "Score a decision using the return observed from that step to the end of the episode.",
+    "content": "$$G_t=r_t+r_{t+1}+\\cdots+r_{T-1}\\qquad(\\gamma=1)$$\n\nDemand and traffic make raw returns noisy. Subtract a reference return for the same situation:\n\n$$w_t=G_t-b(x_t)$$\n\nThe question becomes: **was this outcome better than expected?**",
+    "takeaway": "REINFORCE is a conceptual foundation here, not an experimental controller. This baseline differs from Fixed / Proportional / Threshold.",
+    "diagram": "reinforce"
+  },
+  {
+    "title": "Actor–Critic and Bootstrapping",
+    "intro": "The actor chooses an action; the critic estimates the return still to come.",
+    "content": "Use the observed reward and the next value estimate instead of waiting for the whole episode.\n\n$$y_t=r_t+\\gamma(1-d_t)V_\\phi(x_{t+1})$$\n\n$$\\delta_t=y_t-V_\\phi(x_t)$$\n\n$d_t=1$ at a true episode termination; otherwise $d_t=0$.",
+    "takeaway": "A critic predicts from experience. It does not know future demand or traffic.",
+    "diagram": "td"
+  },
+  {
+    "title": "Advantage and GAE",
+    "intro": "Advantage measures how much better or worse an outcome is than the critic expected.",
+    "content": "$$\\delta_t=r_t+\\gamma(1-d_t)V_{old}(x_{t+1})-V_{old}(x_t)$$\n\n$$\\widehat A_t=\\delta_t+\\gamma\\lambda(1-d_t)\\widehat A_{t+1}$$\n\n$$\\widehat G_t=\\widehat A_t+V_{old}(x_t)$$\n\n**Project:** $\\gamma=1$, $\\lambda=0.95$. Compute backwards through the rollout.",
+    "takeaway": "True episode end: stop bootstrapping. Rollout ends mid-episode: bootstrap from the last observation.",
+    "diagram": "gae"
+  },
+  {
+    "title": "From A2C to PPO",
+    "intro": "Keep the actor–critic structure, but make repeated updates on one rollout more cautious.",
+    "content": "**A2C:** collect parallel experience → estimate advantage → update the shared policy.\n\n$$L_{actor}=-\\mathbb E[\\log\\pi_\\theta(a_t\\mid x_t)\\widehat A_t]$$\n\n**PPO:** compare current and collection-time probabilities, then clip the actor objective.\n\nThis supports multiple minibatches and epochs on a recently collected rollout.",
+    "takeaway": "A2C explains the progression to PPO. The study does not compare A2C against MaskablePPO.",
+    "diagram": "a2c"
+  },
+  {
+    "title": "PPO Ratio, Clipping and Loss",
+    "intro": "Compare the same sampled action under the current policy and the policy that collected it.",
+    "content": "$$\\rho_t(\\theta)=\\frac{\\pi_\\theta(a_t\\mid x_t)}{\\pi_{old}(a_t\\mid x_t)}$$\n\n$$L^{clip}=\\mathbb E\\!\\left[\\min\\!\\left(\\rho_t\\widehat A_t,\\operatorname{clip}(\\rho_t,1-\\epsilon,1+\\epsilon)\\widehat A_t\\right)\\right]$$\n\n**$\\epsilon=0.2$:** ratio reference range **[0.8, 1.2]**.\n\nClipping limits the incentive in the objective; it does not enforce a hard ±20% probability bound.",
+    "takeaway": "PPO clipping acts on the objective; gradient clipping limits gradient norm to 0.5. Learning rate: 0.0003.",
+    "diagram": "ppo"
+  },
+  {
+    "title": "Why MaskablePPO?",
+    "intro": "The environment defines feasible actions; the policy learns which feasible action to choose.",
+    "content": "**221 logits** include state-dependent invalid actions. Apply the mask before sampling:\n\n$$\\pi_\\theta^{mask}(a\\mid x,m)=\\frac{m(a)\\exp(z_a(x))}{\\sum_bm(b)\\exp(z_b(x))}$$\n\nAn invalid action has probability **0**. Valid actions are renormalized; **NOOP** remains valid before terminal.\n\nDuring updates, both probabilities use the sample’s original mask $m_t$.",
+    "takeaway": "Store the mask with every sample. Use it for collection, optimization and evaluation; compute entropy over valid actions.",
+    "diagram": "mask"
+  },
+  {
+    "title": "One Algorithm, Three Encoders",
+    "intro": "All three configurations use MaskablePPO; they differ in how they represent the observation.",
+    "content": "**Trainer:** `MaskablePPO(\"MultiInputPolicy\", ...)`\n\nThe actor and critic share **128 features**, then use separate heads. The action mask applies to the actor distribution.",
+    "takeaway": "GRU10 resets its hidden state each forward; it is not recurrent across decisions. Belief20-fade is a local demand estimate, not a full POMDP belief.",
+    "diagram": "encoders"
+  },
+  {
+    "title": "Controlled Training Protocol",
+    "intro": "Hold the algorithm, environment and training budget constant when comparing encoders.",
+    "content": "| Data and replication | Setting |\n|---|---|\n| Training / validation | 500 / 100 scenario days |\n| Model seeds | 11 · 22 · 33 |\n| Transitions / configuration / seed | 245,760 |\n| Parallel environments / steps each | 4 / 256 |\n| Minibatch / epochs | 256 / 4 |\n\n**3 encoders × 3 seeds = 9 independent runs.**",
+    "takeaway": "500 scenario days do not mean one pass through the data. Transitions measure the training budget; validation does not update weights.",
+    "diagram": "protocol"
+  },
+  {
+    "title": "Collecting a Rollout",
+    "intro": "A rollout is a batch of experience collected with fixed policy weights, not a single episode.",
+    "content": "$$N_{rollout}=4\\times256=1024\\text{ transitions}$$\n\n**Episode:** 240 minutes = 120 decisions. A 256-step collection can cross episode boundaries.\n\nStore **observation, action, reward, episode boundary, old value, old log probability and action mask**.",
+    "takeaway": "Keep episode boundaries: do not carry rewards or advantages from one operating day into the next.",
+    "diagram": "rollout"
+  },
+  {
+    "title": "Updating from the Rollout",
+    "intro": "Compute fixed targets, then reuse the fresh rollout for a limited number of optimizer steps.",
+    "content": "$$1024/256=4\\text{ minibatches per epoch}$$\n\n$$4\\text{ minibatches}\\times4\\text{ epochs}=16\\text{ optimizer steps}$$\n\n**240 rollouts / run:** $245760/1024=240$.\n\nOld log probabilities, old values and return targets stay fixed; current network outputs change after every update.",
+    "takeaway": "This is on-policy learning with short-term rollout reuse. After the update, collect new experience with the updated policy.",
+    "diagram": "update"
+  },
+  {
+    "title": "Validation Measures Dispatch Quality",
+    "intro": "Use held-out days to judge the controller; training loss alone does not measure dispatch quality.",
+    "content": "$$C_{val}=\\frac{1}{N_{val}}\\sum_{i=1}^{N_{val}}C_{core}^{(i)}$$\n\nEvaluate every **12,288 training transitions** on **100 validation days**.\n\n**Training:** sample feasible actions to explore.\n\n**Validation:** choose the highest-probability valid action; keep weights fixed.",
+    "takeaway": "Train updates weights; validation selects checkpoints; test reports final performance. Core cost is a weighted service/operation objective, not money.",
+    "diagram": "validation"
+  },
+  {
+    "title": "Select the Best Checkpoint",
+    "intro": "Choose the lowest eligible validation cost, rather than automatically using the last policy.",
+    "content": "| Model / seed | Initial cost | Best cost | Selected step |\n|---|---:|---:|---:|\n| MLP10 / 22 | 14,598.7 | 13,114.0 | 98,304 |\n| GRU10 / 11 | 18,075.8 | 13,189.8 | 172,032 |\n| Belief20-fade / 22 | 16,155.9 | 13,125.6 | 86,016 |\n\nActual validation records · **245,760 transitions** per run.",
+    "takeaway": "Step 0 is reference only. On a tie, keep the earlier checkpoint. Save best.zip, last.zip, history and run metadata; use best.zip for test.",
+    "diagram": "checkpoint"
+  },
+  {
+    "title": "The Complete Training Workflow",
+    "intro": "Alternate experience collection and policy updates, then evaluate the selected policy on test days.",
+    "content": "During collection, scheduled validation can save a new best checkpoint. After collection, compute GAE and update the policy.\n\nRepeat until **245,760 transitions**, then save the final policy and metadata.\n\nFor test or inference, load **best.zip** and keep weights fixed while making a new dispatch decision every 120 seconds.",
+    "takeaway": "The policy is trained. The next section asks whether it improves cost and service quality on held-out test conditions.",
+    "diagram": "pipeline"
+  }
+]

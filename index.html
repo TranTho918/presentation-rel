@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fafbfc"><title>Bus RL — An AI Dispatcher</title>
+  <link rel="stylesheet" href="vendor/general-sans.css"><link rel="stylesheet" href="vendor/katex.css"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="academic.css">
+  <script defer src="vendor/marked.js"></script><script defer src="vendor/katex.js"></script>
+  <script defer src="slides.js"></script><script defer src="training.js"></script><script defer src="evidence.js"></script><script defer src="network-demo.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#1" aria-label="First slide"><span class="brand-mark">↗</span> Bus RL<span class="brand-sub">A study in dynamic dispatch</span></a><button id="fullscreen" title="Fullscreen (F)">Present ↗</button></header>
+  <nav class="chapters" aria-label="Presentation chapters"><button data-chapter="0">Environment & problem</button><button data-chapter="1">MaskablePPO & training</button><button data-chapter="2">Results & evaluation</button></nav>
+  <main id="stage" aria-live="polite"></main>
+  <footer class="controls"><div class="position"><span id="counter"></span><span id="chapter-name"></span></div><div class="actions"><button id="overview" title="Slide overview (G)">All slides <span>G</span></button><button id="notes-toggle" title="Speaker notes (N)">Notes <span>N</span></button><button id="prev" aria-label="Previous slide">←</button><button id="next" aria-label="Next slide">→</button></div><div class="progress"><div id="progress-fill"></div></div></footer>
+  <aside id="notes" hidden><div><strong>Presenter notes</strong><button id="notes-close" aria-label="Close notes">×</button></div><article id="notes-body"></article></aside>
+  <dialog id="overview-dialog"><div class="dialog-head"><h2>Choose a slide</h2><button id="overview-close" aria-label="Close overview">×</button></div><div id="slide-list"></div></dialog>
+  <noscript>This presentation needs JavaScript. Enable JavaScript and reopen this file.</noscript>
+  <dialog id="sources-dialog"><div class="dialog-head"><span>Repository evidence</span><button onclick="this.closest('dialog').close()" aria-label="Close sources">×</button></div><div id="sources-content"></div></dialog>
+  <dialog id="figure-dialog"><div class="dialog-head"><span id="figure-caption"></span><button onclick="this.closest('dialog').close()" aria-label="Close figure">×</button></div><img id="figure-image" alt=""></dialog>
+</body></html>
