@@ -36,6 +36,17 @@ h1, .opening-copy h1 {
 .route-B .stop i { border-color: #a5763d; }
 .bar-fill.best { background: var(--accent); }
 .flow-node { padding: 22px 18px; font-size: clamp(16px, 1.5vw, 22px); }
+/* Keep lifecycle and state labels inside their boxes on slides 6 and 7. */
+body:is([data-slide="6"], [data-slide="7"]) .flow-node {
+  flex: 1 1 150px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+body:is([data-slide="6"], [data-slide="7"]) .flow-node > * {
+  min-width: 0;
+  max-width: 100%;
+}
 .slide, .slide h1, .slide-copy>*, .slide-visual, .slide-visual>*, .peak, .opening-numbers, .question, .opening-copy .primary { animation-duration: .25s; }
 
 .training-slide { min-height: 100%; height: auto; justify-content: flex-start; }
