@@ -4,104 +4,122 @@
     "intro": "A policy learns which decision reduces cost over the whole operating period.",
     "content": "Every **120 seconds**: observe → choose a feasible action → receive reward.\n\n$$G_t=\\sum_{k=t}^{T-1}\\gamma^{k-t}r_k$$\n\n$$J(\\theta)=\\mathbb{E}_{\\pi_\\theta}[G_0]$$\n\n**Project setting:** $\\gamma=1$ · finite 240-minute episode.",
     "takeaway": "Dispatch may incur deadhead cost now and reduce waiting later. Learn from the full consequence.",
-    "diagram": "policy"
+    "diagram": "policy",
+    "sourceSections": [
+      1
+    ]
   },
   {
     "title": "Policy Gradient",
-    "intro": "Learn action probabilities directly from the consequences of sampled decisions.",
-    "content": "The network produces a **logit** for each action; softmax gives its probability.\n\n$$\\pi_\\theta(a\\mid x)=\\frac{\\exp(z_a(x))}{\\sum_b\\exp(z_b(x))}$$\n\n$$\\widehat g\\propto\\sum_t\\nabla_\\theta\\log\\pi_\\theta(a_t\\mid x_t)\\,w_t$$\n\n$x$: observation and available history. $w_t$: a fixed quality signal during the actor update.",
-    "takeaway": "The gradient passes through the policy network. The simulator does not need to be differentiable.",
-    "diagram": "gradient"
+    "content": "- Maximize expected return $J(\\theta)=\\mathbb E_{\\tau\\sim\\pi_\\theta}[G_0]$.\n- Estimate $\\nabla_\\theta J$ from sampled returns and gradients of log action probabilities.\n- Minimize loss to maximize expected return.",
+    "diagram": "gradient",
+    "sourceSections": [
+      2
+    ],
+    "notes": "Với bài toán MDP hữu hạn của repo và gamma=1, tau là toàn bộ trajectory của một episode. Objective J(theta)=E_{tau~pi_theta}[G_0] là kỳ vọng tổng reward của cả ca.\n\nGradient lý thuyết là kỳ vọng trên trajectory của tổng các đóng góp theo thời gian: nabla J = E_tau[sum_t nabla log pi_theta(a_t|x_t) * w_t]. Đây là phiên bản nhiều bước của công thức bandit; một trajectory có nhiều quyết định nên xuất hiện tổng theo t.\n\nw_t là tín hiệu chấm action tại bước t. Với REINFORCE, dùng return thực tế G_t. Trong biểu thức advantage-based policy gradient, có thể dùng advantage; khi thay bằng advantage ước lượng từ critic/GAE, ta có một ước lượng gradient. Objective vẫn là expected return, không đổi thành kỳ vọng của advantage.\n\nĐặt L(theta)=-J(theta) thì nabla L=-nabla J. Gradient ascent theta += alpha*nablaJ và gradient descent theta -= alpha*nablaL có cùng hướng cập nhật. Công thức trên slide thể hiện quan hệ mục tiêu và gradient lý thuyết; implementation dùng sample loss âm log probability nhân return/advantage đã tách gradient.\n\nNguồn: docs/problem_rl_explained.html, phần 05 Policy gradient và 06 REINFORCE.",
+    "label": "Policy Gradient"
   },
   {
-    "title": "REINFORCE and the Baseline",
-    "intro": "Score a decision using the return observed from that step to the end of the episode.",
-    "content": "$$G_t=r_t+r_{t+1}+\\cdots+r_{T-1}\\qquad(\\gamma=1)$$\n\nDemand and traffic make raw returns noisy. Subtract a reference return for the same situation:\n\n$$w_t=G_t-b(x_t)$$\n\nThe question becomes: **was this outcome better than expected?**",
-    "takeaway": "REINFORCE is a conceptual foundation here, not an experimental controller. This baseline differs from Fixed / Proportional / Threshold.",
-    "diagram": "reinforce"
+    "title": "REINFORCE",
+    "content": "- Monte Carlo policy gradient using complete episodes.\n- Weight each sampled action by its observed reward-to-go $G_t$.\n- No value bootstrapping; learning waits for episode completion and returns can be noisy.",
+    "diagram": "reinforce",
+    "sourceSections": [
+      3
+    ],
+    "notes": "REINFORCE giữ cách cập nhật policy của Policy Gradient và đưa ra một cách tính trọng số cụ thể: w_t bằng return G_t thực tế từ bước t đến hết episode. Đây là Monte Carlo: dùng reward đã quan sát đầy đủ, không bootstrap từ critic.\n\nSau mỗi episode hoặc lô episode hoàn chỉnh, tính return ngược rồi dùng chúng để chấm các action đã lấy mẫu. Cách này đơn giản và không cần một bộ dự đoán value, nhưng phải đợi hết ca và tín hiệu return có variance cao do nhu cầu/giao thông thay đổi.\n\nBaseline có thể được trừ khỏi return để giảm variance, nhưng không phải phần bắt buộc của REINFORCE. Comparator REINFORCE của repo dùng raw return, không learned baseline/critic. Vì vậy slide tập trung vào G_t rồi chuyển sang Actor–Critic: thêm bộ dự đoán value và bootstrap để học từ đoạn trải nghiệm ngắn hơn.\n\nNguồn: docs/problem_rl_explained.html, phần 06 REINFORCE; src/bus_rl/learning/training/algorithms.py.",
+    "label": "REINFORCE"
   },
   {
-    "title": "Actor–Critic and Bootstrapping",
-    "intro": "The actor chooses an action; the critic estimates the return still to come.",
-    "content": "Use the observed reward and the next value estimate instead of waiting for the whole episode.\n\n$$y_t=r_t+\\gamma(1-d_t)V_\\phi(x_{t+1})$$\n\n$$\\delta_t=y_t-V_\\phi(x_t)$$\n\n$d_t=1$ at a true episode termination; otherwise $d_t=0$.",
-    "takeaway": "A critic predicts from experience. It does not know future demand or traffic.",
-    "diagram": "td"
+    "title": "Actor–Critic",
+    "content": "- The actor $\\pi_\\theta$ produces action probabilities.\n- The critic $V_\\phi$ predicts remaining return from reward and the next value estimate.\n- TD error $\\delta_t$ scores actions, allowing learning from short segments.",
+    "diagram": "actor-critic",
+    "sourceSections": [
+      4
+    ],
+    "label": "Actor–Critic",
+    "notes": "Actor–Critic giữ actor học policy bằng policy gradient, đồng thời thêm critic V_phi dự đoán return còn lại từ đầu vào hiện tại. Critic học từ dữ liệu; không biết trước tương lai của ngày mô phỏng.\n\nKhác biệt chính so với REINFORCE là bootstrapping: dùng reward thật vừa thấy cộng value dự đoán ở observation tiếp theo để tạo target y. TD error delta = y - V hiện tại là tín hiệu tốt hơn/kém hơn dự đoán cho actor, đồng thời giúp critic học value.\n\nNhờ dự đoán phần tương lai, việc học có thể dùng các đoạn ngắn hơn thay vì luôn chờ hết episode. Đổi lại, tín hiệu phụ thuộc chất lượng critic. Khi terminal thật d=1, phần bootstrap bằng 0. Ví dụ V=-20, r=-1, V_next=-17 và gamma=1 tạo target=-18, delta=+2.\n\nNguồn: docs/problem_rl_explained.html, phần 07 Actor–Critic.",
+    "equations": [
+      "y_t=r_t+\\gamma(1-d_t)V_\\phi(x_{t+1})",
+      "\\delta_t=y_t-V_\\phi(x_t)"
+    ]
   },
   {
-    "title": "Advantage and GAE",
-    "intro": "Advantage measures how much better or worse an outcome is than the critic expected.",
-    "content": "$$\\delta_t=r_t+\\gamma(1-d_t)V_{old}(x_{t+1})-V_{old}(x_t)$$\n\n$$\\widehat A_t=\\delta_t+\\gamma\\lambda(1-d_t)\\widehat A_{t+1}$$\n\n$$\\widehat G_t=\\widehat A_t+V_{old}(x_t)$$\n\n**Project:** $\\gamma=1$, $\\lambda=0.95$. Compute backwards through the rollout.",
-    "takeaway": "True episode end: stop bootstrapping. Rollout ends mid-episode: bootstrap from the last observation.",
-    "diagram": "gae"
+    "title": "A2C with GAE",
+    "content": "- Parallel environments collect rollout data using one shared policy.\n- Actor and critic receive one synchronous update from the combined batch.\n- Estimate advantage with GAE.",
+    "diagram": "a2c-gae",
+    "sourceSections": [
+      5,
+      6
+    ],
+    "label": "A2C with GAE",
+    "notes": "A2C là Advantage Actor–Critic đồng bộ. Nó giữ actor, critic và tín hiệu advantage của cấu trúc trước, nhưng tổ chức nhiều env cùng dùng một policy để thu đoạn trải nghiệm, gom dữ liệu rồi cập nhật chung. Việc thu dữ liệu và cập nhật diễn ra theo các vòng đồng bộ.\n\nAdvantage chấm action tốt hơn/kém hơn value dự đoán bao nhiêu. A2C có thể dùng n-step return trừ value; GAE không phải điều kiện bắt buộc của A2C. Bản repo chọn GAE với gamma=1, lambda=0.95: cộng các TD error hiện tại và về sau với trọng số giảm dần. Do đó GAE nằm ở slide A2C; PPO ở slide sau vẫn giữ estimator này.\n\nTrong repo, mỗi rollout A2C tạo một optimizer step trên toàn lô bằng Adam. Actor dùng advantage đã chuẩn hóa và tách gradient; critic học target A_hat + V_old được tính trước bước chuẩn hóa. Terminal thật ngắt bootstrap; rollout dừng giữa ca vẫn dùng value để ước lượng phần còn lại.\n\nNguồn: docs/problem_rl_explained.html, phần 08 A2C và 09 PPO/GAE; src/bus_rl/learning/training/algorithms.py; configs/studies/algorithms/a2c.toml. Đối chiếu [Stable-Baselines3 A2C](https://stable-baselines3.readthedocs.io/en/master/modules/a2c.html#parameters)."
   },
   {
-    "title": "From A2C to PPO",
-    "intro": "Keep the actor–critic structure, but make repeated updates on one rollout more cautious.",
-    "content": "**A2C:** collect parallel experience → estimate advantage → update the shared policy.\n\n$$L_{actor}=-\\mathbb E[\\log\\pi_\\theta(a_t\\mid x_t)\\widehat A_t]$$\n\n**PPO:** compare current and collection-time probabilities, then clip the actor objective.\n\nThis supports multiple minibatches and epochs on a recently collected rollout.",
-    "takeaway": "A2C explains the progression to PPO. The study does not compare A2C against MaskablePPO.",
-    "diagram": "a2c"
+    "title": "PPO",
+    "content": "- Learn for multiple epochs on each rollout.\n- Use new probability ÷ old probability to calculate the policy loss.\n- Clip the actor objective to discourage overly large policy updates.",
+    "diagram": "ppo",
+    "sourceSections": [
+      7
+    ],
+    "notes": "PPO giữ actor, critic và advantage; trong repo cả A2C/PPO dùng GAE. Điểm thay đổi chính so với A2C ở đây là tái sử dụng cùng rollout qua nhiều minibatch và epoch thay vì một update toàn lô.\n\nKhi thu rollout, lưu log probability của policy tạo dữ liệu. Trong lúc học, ratio rho đo xác suất action dưới policy hiện tại chia cho xác suất cũ. Sau mỗi update, policy mới khác policy đã tạo dữ liệu nên cần kiểm soát động lực thay đổi quá xa.\n\nPPO-Clip lấy min giữa objective dùng ratio thật và objective dùng ratio đã clip trong [1-epsilon,1+epsilon]. Với epsilon=0.2, clipping làm objective phẳng ở phía tăng quá mức cho advantage dương hoặc giảm quá mức cho advantage âm. Nó không phải ràng buộc cứng lên xác suất hay bảo đảm policy luôn tốt hơn sau update.\n\nLợi ích nhắm tới là tận dụng mỗi rollout nhiều hơn với objective giúp tránh các thay đổi quá mạnh. Trong repo PPO dùng 4 epoch và 16 optimizer steps/rollout; A2C một optimizer step. \n\nNguồn: docs/problem_rl_explained.html, phần 09 PPO; src/bus_rl/learning/training/algorithms.py.",
+    "label": "PPO"
   },
   {
-    "title": "PPO Ratio, Clipping and Loss",
-    "intro": "Compare the same sampled action under the current policy and the policy that collected it.",
-    "content": "$$\\rho_t(\\theta)=\\frac{\\pi_\\theta(a_t\\mid x_t)}{\\pi_{old}(a_t\\mid x_t)}$$\n\n$$L^{clip}=\\mathbb E\\!\\left[\\min\\!\\left(\\rho_t\\widehat A_t,\\operatorname{clip}(\\rho_t,1-\\epsilon,1+\\epsilon)\\widehat A_t\\right)\\right]$$\n\n**$\\epsilon=0.2$:** ratio reference range **[0.8, 1.2]**.\n\nClipping limits the incentive in the objective; it does not enforce a hard ±20% probability bound.",
-    "takeaway": "PPO clipping acts on the objective; gradient clipping limits gradient norm to 0.5. Learning rate: 0.0003.",
-    "diagram": "ppo"
-  },
-  {
-    "title": "Why MaskablePPO?",
+    "title": "MaskablePPO",
     "intro": "The environment defines feasible actions; the policy learns which feasible action to choose.",
-    "content": "**221 logits** include state-dependent invalid actions. Apply the mask before sampling:\n\n$$\\pi_\\theta^{mask}(a\\mid x,m)=\\frac{m(a)\\exp(z_a(x))}{\\sum_bm(b)\\exp(z_b(x))}$$\n\nAn invalid action has probability **0**. Valid actions are renormalized; **NOOP** remains valid before terminal.\n\nDuring updates, both probabilities use the sample’s original mask $m_t$.",
-    "takeaway": "Store the mask with every sample. Use it for collection, optimization and evaluation; compute entropy over valid actions.",
-    "diagram": "mask"
+    "content": "MaskablePPO keeps PPO’s learning process and restricts action selection to feasible choices. As the fleet’s state changes, the mask changes with it.\n\n**221 logits** include state-dependent invalid actions. Apply the mask before sampling:\n\n$$\\pi_\\theta^{mask}(a\\mid x,m)=\\frac{m(a)\\exp(z_a(x))}{\\sum_bm(b)\\exp(z_b(x))}$$\n\nAn invalid action has probability **0**. Valid actions are renormalized.",
+    "diagram": "mask",
+    "sourceSections": [
+      8
+    ],
+    "label": "MaskablePPO"
   },
   {
-    "title": "One Algorithm, Three Encoders",
-    "intro": "All three configurations use MaskablePPO; they differ in how they represent the observation.",
-    "content": "**Trainer:** `MaskablePPO(\"MultiInputPolicy\", ...)`\n\nThe actor and critic share **128 features**, then use separate heads. The action mask applies to the actor distribution.",
-    "takeaway": "GRU10 resets its hidden state each forward; it is not recurrent across decisions. Belief20-fade is a local demand estimate, not a full POMDP belief.",
-    "diagram": "encoders"
+    "title": "Input Encoder",
+    "content": "The actor and critic share **128 features**, then use separate heads.\n\n| Encoder | History | Representation |\n|---|---|---|\n| MLP10 | 10 min | Flatten + MLP 256 → 128 |\n| GRU10 | 10 min | 32 GRU history features + raw features |\n| Belief20-fade | 20 min | Gamma–Poisson demand rate · decay 0.8 |",
+    "diagram": "encoders",
+    "sourceSections": [
+      9
+    ],
+    "label": "Input Encoder"
   },
   {
-    "title": "Controlled Training Protocol",
-    "intro": "Hold the algorithm, environment and training budget constant when comparing encoders.",
-    "content": "| Data and replication | Setting |\n|---|---|\n| Training / validation | 500 / 100 scenario days |\n| Model seeds | 11 · 22 · 33 |\n| Transitions / configuration / seed | 245,760 |\n| Parallel environments / steps each | 4 / 256 |\n| Minibatch / epochs | 256 / 4 |\n\n**3 encoders × 3 seeds = 9 independent runs.**",
-    "takeaway": "500 scenario days do not mean one pass through the data. Transitions measure the training budget; validation does not update weights.",
-    "diagram": "protocol"
-  },
-  {
-    "title": "Collecting a Rollout",
-    "intro": "A rollout is a batch of experience collected with fixed policy weights, not a single episode.",
-    "content": "$$N_{rollout}=4\\times256=1024\\text{ transitions}$$\n\n**Episode:** 240 minutes = 120 decisions. A 256-step collection can cross episode boundaries.\n\nStore **observation, action, reward, episode boundary, old value, old log probability and action mask**.",
-    "takeaway": "Keep episode boundaries: do not carry rewards or advantages from one operating day into the next.",
-    "diagram": "rollout"
-  },
-  {
-    "title": "Updating from the Rollout",
-    "intro": "Compute fixed targets, then reuse the fresh rollout for a limited number of optimizer steps.",
-    "content": "$$1024/256=4\\text{ minibatches per epoch}$$\n\n$$4\\text{ minibatches}\\times4\\text{ epochs}=16\\text{ optimizer steps}$$\n\n**240 rollouts / run:** $245760/1024=240$.\n\nOld log probabilities, old values and return targets stay fixed; current network outputs change after every update.",
-    "takeaway": "This is on-policy learning with short-term rollout reuse. After the update, collect new experience with the updated policy.",
-    "diagram": "update"
-  },
-  {
-    "title": "Validation Measures Dispatch Quality",
-    "intro": "Use held-out days to judge the controller; training loss alone does not measure dispatch quality.",
-    "content": "$$C_{val}=\\frac{1}{N_{val}}\\sum_{i=1}^{N_{val}}C_{core}^{(i)}$$\n\nEvaluate every **12,288 training transitions** on **100 validation days**.\n\n**Training:** sample feasible actions to explore.\n\n**Validation:** choose the highest-probability valid action; keep weights fixed.",
-    "takeaway": "Train updates weights; validation selects checkpoints; test reports final performance. Core cost is a weighted service/operation objective, not money.",
-    "diagram": "validation"
-  },
-  {
-    "title": "Select the Best Checkpoint",
-    "intro": "Choose the lowest eligible validation cost, rather than automatically using the last policy.",
-    "content": "| Model / seed | Initial cost | Best cost | Selected step |\n|---|---:|---:|---:|\n| MLP10 / 22 | 14,598.7 | 13,114.0 | 98,304 |\n| GRU10 / 11 | 18,075.8 | 13,189.8 | 172,032 |\n| Belief20-fade / 22 | 16,155.9 | 13,125.6 | 86,016 |\n\nActual validation records · **245,760 transitions** per run.",
-    "takeaway": "Step 0 is reference only. On a tie, keep the earlier checkpoint. Save best.zip, last.zip, history and run metadata; use best.zip for test.",
-    "diagram": "checkpoint"
-  },
-  {
-    "title": "The Complete Training Workflow",
-    "intro": "Alternate experience collection and policy updates, then evaluate the selected policy on test days.",
-    "content": "During collection, scheduled validation can save a new best checkpoint. After collection, compute GAE and update the policy.\n\nRepeat until **245,760 transitions**, then save the final policy and metadata.\n\nFor test or inference, load **best.zip** and keep weights fixed while making a new dispatch decision every 120 seconds.",
-    "takeaway": "The policy is trained. The next section asks whether it improves cost and service quality on held-out test conditions.",
-    "diagram": "pipeline"
+    "title": "Training Data, Budget and Evaluation",
+    "takeaway": "Train updates weights; validation selects best.zip; test reports performance. Evaluation steps are outside the training budget.",
+    "diagram": "training-flow",
+    "sourceSections": [
+      11,
+      12,
+      13,
+      14
+    ],
+    "label": "Kịch bản, ngân sách train và đánh giá",
+    "steps": [
+      {
+        "title": "500 scenarios",
+        "detail": "Training-day pool, sampled again at reset."
+      },
+      {
+        "title": "Episode",
+        "detail": "One operating day: 240 min = 120 RL steps."
+      },
+      {
+        "title": "Step / transition",
+        "detail": "One action and feedback every 2 simulated min."
+      },
+      {
+        "title": "4 environments",
+        "detail": "Shared policy; 4 transitions per joint step."
+      },
+      {
+        "title": "Rollout",
+        "detail": "Set 256 steps/env. 4 envs × 256 steps = 1,024 transitions per rollout."
+      },
+      {
+        "title": "245,760 transitions",
+        "detail": ""
+      }
+    ],
+    "notes": "Ví dụ xét một lần train PPO có mask với một seed. Kho 500 kịch bản chứa arrivals/traffic của các ca khác nhau. Mỗi env lấy ngẫu nhiên một kịch bản khi reset; cùng kịch bản có thể được chạy lại nhiều lần.\n\nMột episode là một ca 240 phút. Agent quyết định mỗi 2 phút, nên mỗi episode có 120 steps và tạo 120 transitions. Transition ghi observation, action, reward, observation mới và trạng thái kết thúc.\n\nBốn env có trạng thái mô phỏng riêng nhưng dùng một policy. Mỗi lượt cả bốn tiến một bước, bộ đếm tăng 4. Tổng 245.760 transitions là 4 env × 512 episodes/env × 120 transitions/episode = 2.048 episodes lấy mẫu trên kho 500 kịch bản.\n\nRollout là lô thu trước một vòng cập nhật: PPO thu 256 bước/env × 4 env = 1.024 transitions. Cả run có 240 rollout. Episode kết thúc ca; rollout kết thúc một lô thu thập, nên hai ranh giới có thể khác nhau. PPO học 4 epoch, mỗi epoch 4 minibatch, tạo 16 optimizer steps/rollout.\n\n100 ngày validation chỉ đo cost để chọn best.zip. Sau khi chọn, checkpoint được đánh giá trên 600 ngày test riêng: 200 bình thường, 200 tăng nhu cầu, 200 gián đoạn giao thông. Mỗi checkpoint tạo 72.000 transitions test, ngoài ngân sách train. Evaluation giữ nguyên trọng số.\n\nTrong phần mở rộng thuật toán/mask, validation đo sau cập nhật, gồm cả trọng số cuối; snapshot encoder gốc có lịch callback trong lúc thu rollout. Các con số dữ liệu/budget và vai trò train/validation/test trên slide áp dụng cho cả hai; không dùng chúng để đánh đồng hai lịch validation."
   }
 ]
