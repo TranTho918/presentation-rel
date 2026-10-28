@@ -1,3 +1,5 @@
+Current slide order: References is slide 2, immediately after the opening slide. The deck has 32 slides; all other slides retain their relative order.
+
 Latest: removed former slide 13. The deck now has 37 slides; chapter 2 starts at 14 and results at 29.
 
 ## Autonomous 16:9 demo
